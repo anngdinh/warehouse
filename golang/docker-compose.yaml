@@ -1,0 +1,9 @@
+version: '2'
+services:  
+  go-app:
+    image: annd2/go-app:1.0.0
+    container_name: go-app
+    network_mode: host
+    restart: always
+    volumes:
+      - ./cassandra/main.go:/build/main.go
