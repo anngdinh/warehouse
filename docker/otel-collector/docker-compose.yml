@@ -1,0 +1,21 @@
+version: '2'
+services:  
+  otel_collector:
+    container_name: otel
+    image: otel/opentelemetry-collector-contrib:latest
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    volumes:
+      - ./otel/config.yaml:/etc/otelcol-contrib/config.yaml
+    ports:
+      - 4317:4317   # OTLP gRPC receiver
+      - 4318:4318   # OTLP http receiver
+    restart: always
+    depends_on:
+      - jaeger
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - 16686:16686
+      # - 14269:14269 # http://localhost:14269/metrics
+    restart: always
