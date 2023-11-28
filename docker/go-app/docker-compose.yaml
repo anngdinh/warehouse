@@ -1,0 +1,11 @@
+version: '2'
+services:  
+  go-app:
+    image: annd2/go-app:1.0.0
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: go-app
+    restart: always
+    volumes:
+      - ./test.go:/build/main.go
