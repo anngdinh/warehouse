@@ -1,0 +1,97 @@
+version: "2.1"
+
+services:
+  coroot:
+    image: ghcr.io/coroot/coroot:0.23.0
+    container_name: coroot
+    ports:
+      - "8080:8080"
+    environment:
+      # https://github.com/coroot/coroot/blob/main/main.go
+      # LISTEN: "0.0.0.0.8080"
+      # URL_BASE_PATH: "/"
+      # DATA_DIR: "/data"
+      # CACHE_TTL: "720h"
+      # CACHE_GC_INTERVAL: "10m"
+      # PG_CONNECTION_STRING: "postgresql://annd2:password@postgres:5432/annd2?sslmode=disable"
+      # DISABLE_USAGE_STATISTICS: "true"
+      # READ_ONLY: "false"
+      BOOTSTRAP_PROMETHEUS_URL: "http://prometheus:9090" # if set, Coroot will create a project for this Prometheus URL
+      # BOOTSTRAP_REFRESH_INTERVAL: "1m"
+      # BOOTSTRAP_PROMETHEUS_EXTRA_SELECTOR: ""
+      # DO_NOT_CHECK_SLO: "false"
+      # DO_NOT_CHECK_FOR_DEPLOYMENTS: "false"
+      # DO_NOT_CHECK_FOR_UPDATES: "false"
+      # BOOTSTRAP_PYROSCOPE_URL: "http://pyroscope:4040" # if set, Coroot will add a Pyroscope integration
+      BOOTSTRAP_CLICKHOUSE_ADDRESS: "clickhouse:9000" # if set, Coroot will add a Clickhouse integration
+      BOOTSTRAP_CLICKHOUSE_USER: "annd2"
+      BOOTSTRAP_CLICKHOUSE_PASSWORD: "password"
+      BOOTSTRAP_CLICKHOUSE_DATABASE: "otel"
+      BOOTSTRAP_CLICKHOUSE_TRACES_TABLE: "otel_traces"
+      BOOTSTRAP_CLICKHOUSE_LOGS_TABLE: "otel_logs"
+
+    pull_policy: always
+    restart: always
+
+  coroot-node-agent:
+    privileged: true
+    pid: host
+    image: ghcr.io/coroot/coroot-node-agent:1.15.0
+    container_name: exporter
+    restart: unless-stopped
+    expose:
+      - 80
+    environment:
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: "http://otel:4318/v1/traces"
+      OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: "http://otel:4318/v1/logs"
+    ports:
+      - "8888:80"
+    volumes:
+      - /sys/fs/cgroup:/host/sys/fs/cgroup:ro
+      - /sys/kernel/debug:/sys/kernel/debug:rw
+    command: --cgroupfs-root=/host/sys/fs/cgroup
+    pull_policy: always
+
+  prometheus:
+    image: prom/prometheus:v2.36.2
+    container_name: prometheus
+    volumes:
+      - ./prometheus/:/etc/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    ports:
+      - 9090:9090
+    restart: always
+
+  clickhouse:
+    image: clickhouse/clickhouse-server
+    container_name: clickhouse
+    ports:
+      - "9000:9000"
+      - "8123:8123"
+      - "9009:9009"
+    environment:
+      - CLICKHOUSE_USER=annd2
+      - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
+      - CLICKHOUSE_PASSWORD=password
+      # CLICKHOUSE_ADMIN_USER: "annd2"
+      # CLICKHOUSE_ADMIN_PASSWORD: "password"
+      # ALLOW_EMPTY_PASSWORD: yes
+    restart: always
+
+  otel_collector:
+    container_name: otel
+    image: otel/opentelemetry-collector-contrib:latest
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    volumes:
+      - ./otel/config.yaml:/etc/otelcol-contrib/config.yaml
+    restart: always
+    depends_on:
+      - jaeger
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
+    ports:
+      - 16687:16686
+    restart: always
