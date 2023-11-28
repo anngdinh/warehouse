@@ -4,6 +4,7 @@ WORKDIR /build
 ADD . /build
 RUN go mod init main
 RUN go mod tidy
+RUN go get all
 # RUN ls -a -l
 # RUN go build ./main.go
 ENTRYPOINT [ "go", "run", "main.go" ]

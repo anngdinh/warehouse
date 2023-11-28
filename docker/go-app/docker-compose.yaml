@@ -6,6 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: go-app
+    network_mode: "host"
     restart: always
     volumes:
       - ./test.go:/build/main.go
