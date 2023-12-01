@@ -1,0 +1,10 @@
+# https://github.com/prometheus-community/elasticsearch_exporter
+version: "2"
+services:
+  elasticsearch_exporter:
+    image: quay.io/prometheuscommunity/elasticsearch-exporter:latest
+    command:
+      - "--es.uri=http://username:password@localhost:9200"
+    restart: always
+    ports:
+      - "9114:9114"
