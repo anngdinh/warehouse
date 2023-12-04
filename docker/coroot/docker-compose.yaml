@@ -17,7 +17,7 @@ services:
       # DISABLE_USAGE_STATISTICS: "true"
       # READ_ONLY: "false"
       BOOTSTRAP_PROMETHEUS_URL: "http://prometheus:9090" # if set, Coroot will create a project for this Prometheus URL
-      # BOOTSTRAP_REFRESH_INTERVAL: "1m"
+      BOOTSTRAP_REFRESH_INTERVAL: "30s"
       # BOOTSTRAP_PROMETHEUS_EXTRA_SELECTOR: ""
       # DO_NOT_CHECK_SLO: "false"
       # DO_NOT_CHECK_FOR_DEPLOYMENTS: "false"
