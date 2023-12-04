@@ -9,3 +9,4 @@ services:
       - ~/apps/cassandra:/var/lib/cassandra
     environment:
       - CASSANDRA_CLUSTER_NAME=cloudinfra
+    restart: always
