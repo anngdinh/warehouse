@@ -1,0 +1,15 @@
+version: "2"
+services:
+  # sudo docker run --rm -u 0 -it -p 8088:8080 -e DEBUG=1 -e STORAGE=local -e STORAGE_LOCAL_ROOTDIR=/charts -v $(pwd)/charts:/charts chartmuseum/chartmuseum:latest
+  chartmuseum:
+    image: chartmuseum/chartmuseum:latest
+    container_name: chartmuseum
+    user: root
+    ports:
+      - "8088:8080"
+    environment:
+      - DEBUG=1
+      - STORAGE=local
+      - STORAGE_LOCAL_ROOTDIR=/charts
+    # volumes:
+    #   - ./charts:/charts
