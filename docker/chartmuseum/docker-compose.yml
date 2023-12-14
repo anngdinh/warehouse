@@ -13,3 +13,4 @@ services:
       - STORAGE_LOCAL_ROOTDIR=/charts
     # volumes:
     #   - ./charts:/charts
+    restart: always
