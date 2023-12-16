@@ -2,7 +2,7 @@ version: "2.1"
 
 services:
   coroot:
-    image: ghcr.io/coroot/coroot:0.23.0
+    image: ghcr.io/coroot/coroot:0.25.0
     container_name: coroot
     ports:
       - "8080:8080"
@@ -22,11 +22,11 @@ services:
       # DO_NOT_CHECK_SLO: "false"
       # DO_NOT_CHECK_FOR_DEPLOYMENTS: "false"
       # DO_NOT_CHECK_FOR_UPDATES: "false"
-      # BOOTSTRAP_PYROSCOPE_URL: "http://pyroscope:4040" # if set, Coroot will add a Pyroscope integration
+      BOOTSTRAP_PYROSCOPE_URL: "http://pyroscope:4040" # if set, Coroot will add a Pyroscope integration
       BOOTSTRAP_CLICKHOUSE_ADDRESS: "clickhouse:9000" # if set, Coroot will add a Clickhouse integration
       BOOTSTRAP_CLICKHOUSE_USER: "annd2"
       BOOTSTRAP_CLICKHOUSE_PASSWORD: "password"
-      BOOTSTRAP_CLICKHOUSE_DATABASE: "otel"
+      BOOTSTRAP_CLICKHOUSE_DATABASE: otel_clickhouse_db
       BOOTSTRAP_CLICKHOUSE_TRACES_TABLE: "otel_traces"
       BOOTSTRAP_CLICKHOUSE_LOGS_TABLE: "otel_logs"
 
@@ -44,6 +44,8 @@ services:
     environment:
       OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: "http://otel:4318/v1/traces"
       OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: "http://otel:4318/v1/logs"
+      TRACK_PUBLIC_NETWORK: 0.0.0.0/0
+      PROFILES_ENDPOINT: "http://pyroscope:4040/ingest"
     ports:
       - "8888:80"
     volumes:
@@ -94,4 +96,16 @@ services:
     container_name: jaeger
     ports:
       - 16687:16686
+    restart: always
+  
+  pyroscope:
+    image: pyroscope/pyroscope:latest
+    container_name: pyroscope
+    # ports:
+    #   - 4040:4040
+    command:
+      - "server"
+    deploy:
+      restart_policy:
+        condition: on-failure
     restart: always
