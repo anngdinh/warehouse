@@ -1,0 +1,14 @@
+version: '3.3'
+services:
+  octant:
+    image: vcr.vngcloud.vn/60108-annd2-ingress/octant:v0.25.1
+    # network_mode: host
+    environment:
+      - "OCTANT_DISABLE_OPEN_BROWSER=true"
+      - "OCTANT_LISTENER_ADDR=0.0.0.0:9000"
+      - "KUBECONFIG=/output/kubeconfig.yaml"
+    volumes:
+      - "~/.kube/config:/output/kubeconfig.yaml"
+    ports:
+      - 9001:9000
+    restart: always
