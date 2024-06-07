@@ -38,6 +38,10 @@ sudo -u $NAME echo $PUBKEY > /home/$NAME/.ssh/authorized_keys
 sudo -i echo "$NAME ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/$NAME
 ```
 
+## K8S
+
+[Create user](./k8s-create-user.sh)
+
 ## Helm
 
 ```bash
