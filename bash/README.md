@@ -59,3 +59,22 @@ helm uninstall -n coroot coroot
 helm repo update
 helm install --namespace coroot coroot hub-cls/coroot
 ```
+
+## Install
+
+### Velero
+  
+```bash
+curl -OL https://github.com/vmware-tanzu/velero/releases/download/v1.13.2/velero-v1.13.2-linux-amd64.tar.gz
+tar -xvf velero-v1.13.2-linux-amd64.tar.gz
+cp velero-v1.13.2-linux-amd64/velero /usr/local/bin
+```
+
+### Kubecolor
+
+```bash
+curl -OL https://github.com/kubecolor/kubecolor/releases/download/v0.3.3/kubecolor_0.3.3_linux_amd64.tar.gz
+tar -xvf kubecolor_0.3.3_linux_amd64.tar.gz
+cp kubecolor /usr/local/bin
+echo 'alias k=kubecolor' >> ~/.bashrc
+```
