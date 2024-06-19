@@ -1,0 +1,15 @@
+127.0.0.1       localhost
+::1     localhost ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+172.22.0.2      squid
+
+116.118.93.158 monitoring-agent.vngcloud.vn
+116.118.93.14 iamapis.vngcloud.vn
+
+# 127.0.0.1 monitoring-agent.vngcloud.vn
+# 127.0.0.1 iamapis.vngcloud.vn
+
+# sudo resolvectl flush-caches

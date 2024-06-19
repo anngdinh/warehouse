@@ -17,3 +17,5 @@ services:
 volumes:
   postgres_volume:
     driver: local
+
+# postgresql://postgres:postgres@localhost:5432/mydb

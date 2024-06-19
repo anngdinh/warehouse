@@ -1,12 +1,12 @@
 version: '2'
 services:  
   go-app:
-    image: annd2/go-app:1.0.0
+    image: vcr.vngcloud.vn/60108-annd2-ingress/goapp-debug:v2.0.0
     build:
       context: .
       dockerfile: Dockerfile
     container_name: go-app
     network_mode: "host"
     restart: always
-    volumes:
-      - ./test.go:/build/main.go
+    # volumes:
+    #   - ./test.go:/build/main.go
