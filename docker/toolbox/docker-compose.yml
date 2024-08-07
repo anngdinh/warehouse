@@ -1,0 +1,8 @@
+version: "3.3"
+services:
+  toolbox:
+    image: vcr.vngcloud.vn/60108-annd2-ingress/toolbox:1.0.0
+    container_name: toolbox
+    restart: always
+    stdin_open: true # docker run -i
+    tty: true # docker run -t
