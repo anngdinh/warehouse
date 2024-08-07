@@ -87,3 +87,11 @@ tar -xvf kubecolor_0.3.3_linux_amd64.tar.gz
 cp kubecolor /usr/local/bin
 echo 'alias k=kubecolor' >> ~/.bashrc
 ```
+
+### Kubectl node-shell
+
+```bash
+curl -LO https://github.com/kvaps/kubectl-node-shell/raw/master/kubectl-node_shell
+chmod +x ./kubectl-node_shell
+sudo mv ./kubectl-node_shell /usr/local/bin/kubectl-node_shell
+```
