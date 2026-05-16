@@ -22,20 +22,63 @@ top -p $(pgrep -d, -f "go run main.go")
 Add user
 
 ```bash
-#!/bin/bash
-if [ -z "$1" ] ||[ -z "$2" ]
-then
-  read -p "Username: " NAME
-  read -p "Publickey: " PUBKEY
-else
-  NAME=$1
-  PUBKEY=$2
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if [[ $EUID -ne 0 ]]; then
+  echo "Please run as root or with sudo"
+  exit 1
 fi
-echo "Creating and adding permission for user $NAME"
-sudo adduser --shell /bin/bash --gecos "" --disabled-password $NAME
-sudo -u $NAME mkdir -p /home/$NAME/.ssh
-sudo -u $NAME echo $PUBKEY > /home/$NAME/.ssh/authorized_keys
-sudo -i echo "$NAME ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/$NAME
+
+if [[ $# -lt 2 ]]; then
+  read -rp "Username: " NAME
+  read -rp "Public key: " PUBKEY
+else
+  NAME="$1"
+  PUBKEY="$2"
+fi
+
+HOME_DIR="/home/$NAME"
+SSH_DIR="$HOME_DIR/.ssh"
+AUTHORIZED_KEYS="$SSH_DIR/authorized_keys"
+SUDOERS_FILE="/etc/sudoers.d/$NAME"
+
+echo "Creating user: $NAME"
+
+# Create user if not exists
+if id "$NAME" &>/dev/null; then
+  echo "User already exists"
+else
+  adduser \
+    --shell /bin/bash \
+    --gecos "" \
+    --disabled-password \
+    "$NAME"
+fi
+
+# Setup SSH
+mkdir -p "$SSH_DIR"
+
+echo "$PUBKEY" > "$AUTHORIZED_KEYS"
+
+# Permissions
+chown -R "$NAME:$NAME" "$SSH_DIR"
+chmod 700 "$SSH_DIR"
+chmod 600 "$AUTHORIZED_KEYS"
+
+# Passwordless sudo
+echo "$NAME ALL=(ALL:ALL) NOPASSWD: ALL" > "$SUDOERS_FILE"
+chmod 440 "$SUDOERS_FILE"
+
+# Validate sudoers
+visudo -cf "$SUDOERS_FILE"
+
+echo "================================="
+echo "User created successfully"
+echo "Username: $NAME"
+echo "Home: $HOME_DIR"
+echo "================================="
 ```
 
 ## K8S
