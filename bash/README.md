@@ -148,3 +148,64 @@ curl -LO https://github.com/kvaps/kubectl-node-shell/raw/master/kubectl-node_she
 chmod +x ./kubectl-node_shell
 sudo mv ./kubectl-node_shell /usr/local/bin/kubectl-node_shell
 ```
+
+### Zshrc
+
+```sh
+export PATH="$HOME/.local/bin:$PATH"
+source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+alias docker=podman
+alias k=kubecolor
+
+# --- Line-editing parity with VS Code's terminal ---------------------
+bindkey -e   # emacs keymap (zsh default unless $EDITOR/$VISUAL is vi)
+
+# Word boundaries: default WORDCHARS includes '-' so "hello-world" is ONE
+# word. Trim it so -, ., / act as word boundaries (word ops stop at them).
+WORDCHARS='_'
+# (use WORDCHARS='' to split on every punctuation, closest to VS Code's editor)
+
+# Word motion / deletion — bind BOTH the Meta form (what ~/.wezterm.lua
+# sends) and the xterm CSI form, so it works regardless of the sequence.
+bindkey '\eb'     backward-word        # Option+Left
+bindkey '\ef'     forward-word         # Option+Right
+bindkey '^[[1;3D' backward-word        # Option+Left (CSI form)
+bindkey '^[[1;3C' forward-word         # Option+Right (CSI form)
+bindkey '\e^?'    backward-kill-word   # Option+Backspace
+bindkey '\ed'     kill-word            # Option+fn+Delete (forward)
+bindkey '^W'      backward-kill-word   # Ctrl+W
+
+# Up/Down: search history by what's already typed ("claude" + Up → only claude…)
+autoload -U up-line-or-beginning-search down-line-or-beginning-search
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
+bindkey '^[[A' up-line-or-beginning-search     # Up   (normal mode)
+bindkey '^[OA' up-line-or-beginning-search     # Up   (application mode)
+bindkey '^[[B' down-line-or-beginning-search   # Down
+bindkey '^[OB' down-line-or-beginning-search
+setopt HIST_IGNORE_ALL_DUPS   # no repeated entries while stepping through
+
+# zsh-autosuggestions: Option+Right (forward-word) accepts ONE word of the
+# suggestion at a time; full-accept stays on End / Ctrl+E.
+ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS=(forward-word emacs-forward-word vi-forward-word)
+
+# --- zsh-syntax-highlighting -----------------------------------------
+# MUST be sourced LAST — it wraps the ZLE line editor, so anything that
+# defines widgets/bindings (incl. zsh-autosuggestions above) has to load first.
+# Highlighters (set BEFORE the source line): main = syntax, brackets = match/mismatch.
+ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets)
+source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+
+# awake on|off|status: keep Mac from sleeping (screen still locks)
+awake() {
+  local p=~/Library/LaunchAgents/local.caffeinate.plist
+  case $1 in
+    on)  launchctl bootstrap gui/$UID $p 2>/dev/null; echo "awake: on" ;;
+    off) launchctl bootout gui/$UID/local.caffeinate 2>/dev/null; echo "awake: off" ;;
+    *)   launchctl print gui/$UID/local.caffeinate &>/dev/null && echo "awake: on" || echo "awake: off" ;;
+  esac
+}
+```
+
